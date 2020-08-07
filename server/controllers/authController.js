@@ -1,5 +1,6 @@
 const User = require('./../models/user');
 const jwt = require('jsonwebtoken');
+const validator = require('../util/validators');
 
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -15,20 +16,38 @@ const cookieOptions = {
 };
 
 exports.signup = async (req, res, next) => {
-  const newUser = await User.create({
+  const newUser = {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+  };
+
+  const { valid, errors } = validator.validateSignup(newUser);
+  if (!valid) return res.status(400).json(errors);
+
+  const emailCheck = await User.findOne({ email: newUser.email });
+
+  if (emailCheck) {
+    return res.status(400).json({
+      errors: 'Email already taken',
+    });
+  }
+
+  const addNewUser = await User.create({
+    name: newUser.name,
+    email: newUser.email,
+    password: newUser.password,
+    passwordConfirm: newUser.passwordConfirm,
   });
 
-  const token = signToken(newUser._id);
+  const token = signToken(addNewUser._id);
   res.cookie('jwt', token, cookieOptions);
   res.req.res.status(201).json({
     status: 'success',
     token,
     data: {
-      user: newUser,
+      user: addNewUser,
     },
   });
 };
@@ -37,13 +56,17 @@ exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   //Check if email and password exists
   if (!email || !password) {
-    console.log('Please provide email and password!');
+    return res.status(400).json({
+      errors: 'Please provide email and password',
+    });
   } else {
     //check if user exist and the password exist
     const user = await User.findOne({ email: email }).select('+password');
 
     if (!user || !(await user.correctPassword(password, user.password))) {
-      return console.log('Inccorrect data!');
+      return res.status(400).json({
+        errors: 'Email or password incorrect',
+      });
     }
 
     //if eery is ok send the token to the client
@@ -73,16 +96,21 @@ exports.protect = async (req, res, next) => {
   const token = req.cookies.jwt;
   const logSession = req.cookies.session;
   if (token && logSession) {
+    let freshUser;
     //2) Verification token
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if (!err) {
-        const freshUser = await User.findById(decoded.id);
+        freshUser = await User.findById(decoded.id);
+        if (freshUser) {
+          req.user = freshUser;
+        }
         if (!freshUser) {
           console.log('Not the user!');
         }
       }
     });
-    next();
+
+    return next();
   } else {
     return res.json({
       status: 'fail',

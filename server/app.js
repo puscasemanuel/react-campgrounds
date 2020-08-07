@@ -10,6 +10,8 @@ const xss = require('xss-clean');
 const path = require('path');
 const cors = require('cors');
 const User = require('./models/user');
+const validateAddCampground = require('./util/validators');
+const validator = require('./util/validators');
 require('dotenv').config();
 
 mongoose.connect(
@@ -70,6 +72,7 @@ app.get(
       status: 'success',
       data: {
         campground,
+        user: req.user,
       },
     });
   }
@@ -77,21 +80,27 @@ app.get(
 
 //Add campground
 app.post('/api/v1/campgrounds', authController.protect, async (req, res) => {
-  const name = req.body.name;
-  const image = req.body.image;
-  const description = req.body.description;
-  const price = req.body.price;
-  const author = {
-    id: req.body.author.id,
-    username: req.body.author.username,
+  const data = {
+    name: req.body.name,
+    image: req.body.image,
+    description: req.body.description,
+    price: req.body.price,
+    author: {
+      id: req.body.author.id,
+      username: req.body.author.username,
+    },
   };
+
+  const { valid, errors } = validator.validateAddCampground(data);
+  if (!valid) return res.status(400).json(errors);
+
   try {
     const campgrounds = await Campground.create({
-      name: name,
-      image: image,
-      description: description,
-      price: price,
-      author: author,
+      name: data.name,
+      image: data.image,
+      description: data.description,
+      price: data.price,
+      author: data.author,
     });
     res.status(200).json({
       status: 'success',
@@ -101,6 +110,7 @@ app.post('/api/v1/campgrounds', authController.protect, async (req, res) => {
     res.json({
       status: 'fail',
       message: error,
+      user: req.user,
     });
   }
 });
@@ -118,6 +128,7 @@ app.put('/api/v1/campgrounds/:id', authController.protect, async (req, res) => {
       username: req.body.author.username,
     },
   };
+
   try {
     const authorId = await User.findById(data.author.id);
     if (authorId.name === data.author.username) {
@@ -180,10 +191,10 @@ app.post('/api/v1/login', authController.login);
 // });
 
 //ONLY FOR PRODUCTION
-app.use(express.static(path.join(__dirname, 'build')));
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// app.use(express.static(path.join(__dirname, 'build')));
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
 const port = process.env.PORT || 8080;
 

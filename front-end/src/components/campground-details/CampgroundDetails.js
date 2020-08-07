@@ -23,9 +23,12 @@ function CampgroundDetails() {
 
   useEffect(() => {
     const fetchCampground = async () => {
-      const result = await axios(`/api/v1/campgrounds/${id}`, {
-        withCredentials: true,
-      });
+      const result = await axios(
+        `http://localhost:8080/api/v1/campgrounds/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
       // console.log(result.data.data.campground);
       setItem(result.data.data.campground);
       setIsLoading(false);
@@ -36,7 +39,7 @@ function CampgroundDetails() {
   const deleteCampground = () => {
     if (window.confirm('Are you sure?')) {
       axios
-        .delete(`/api/v1/campgrounds/${id}`, {
+        .delete(`http://localhost:8080/api/v1/campgrounds/${id}`, {
           withCredentials: true,
         })
         .then((data) => {

@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
+import Alert from 'react-bootstrap/Alert';
+import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 
 export const NewCampground = () => {
   const [userData, setUserData] = useState([]);
-  const [isDisabled, setIsDisabled] = useState(true);
+  const [show, setShow] = useState(true);
+  //const [isDisabled, setIsDisabled] = useState(true);
 
   const [data, setData] = useState({
     name: '',
@@ -18,6 +21,7 @@ export const NewCampground = () => {
       id: '',
       username: '',
     },
+    errors: {},
   });
 
   useEffect(() => {
@@ -34,9 +38,9 @@ export const NewCampground = () => {
   const handleInput = (e) => {
     const { name, value } = e.target;
 
-    if (data.name !== '' && data.description !== '') {
-      setIsDisabled(false);
-    }
+    // if (data.name !== '' && data.description !== '') {
+    //   setIsDisabled(false);
+    // }
     setData(() => {
       return {
         ...data,
@@ -52,14 +56,20 @@ export const NewCampground = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post(`/api/v1/campgrounds`, data, {
+      .post(`http://localhost:8080/api/v1/campgrounds`, data, {
         withCredentials: true,
       })
       .then((res) => {
-        console.log(res);
+        window.location = '/';
+      })
+      .catch((err) => {
+        console.log(err);
+        setData({
+          ...data,
+          errors: err.response.data,
+        });
+        setShow(true);
       });
-
-    window.location = '/';
   };
 
   return isLoading ? (
@@ -73,11 +83,25 @@ export const NewCampground = () => {
     </div>
   ) : (
     <Container className="mt-5">
+      {Object.keys(data.errors).length > 0 && show ? (
+        <Alert
+          variant="danger"
+          onClose={() => setShow(false)}
+          className="mt-5"
+          dismissible
+        >
+          <Alert.Heading>Oh! You got errors!</Alert.Heading>
+          {Object.keys(data.errors).map((item) => {
+            return <p key={uuidv4()}>{data.errors[item]}</p>;
+          })}
+        </Alert>
+      ) : (
+        <></>
+      )}
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Title</Form.Label>
           <Form.Control
-            required
             name="name"
             value={data.name}
             onChange={handleInput}
@@ -89,7 +113,6 @@ export const NewCampground = () => {
         <Form.Group controlId="formBasicPassword">
           <Form.Label>Image</Form.Label>
           <Form.Control
-            required
             value={data.image}
             onChange={handleInput}
             name="image"
@@ -101,7 +124,6 @@ export const NewCampground = () => {
         <Form.Group controlId="formBasicPassword">
           <Form.Label>Price</Form.Label>
           <Form.Control
-            required
             name="price"
             onChange={handleInput}
             value={data.price}
@@ -113,7 +135,6 @@ export const NewCampground = () => {
         <Form.Group controlId="exampleForm.ControlTextarea1">
           <Form.Label>Description</Form.Label>
           <Form.Control
-            required
             value={data.description}
             name="description"
             onChange={handleInput}
@@ -123,7 +144,7 @@ export const NewCampground = () => {
         </Form.Group>
 
         <div className="text-center">
-          <Button disabled={isDisabled} block variant="primary" type="submit">
+          <Button block variant="primary" type="submit">
             Add new campground
           </Button>
         </div>

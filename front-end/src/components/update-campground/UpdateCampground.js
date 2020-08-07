@@ -32,9 +32,12 @@ export const UpdateCampground = () => {
 
   useEffect(() => {
     const campData = async () => {
-      const result = await axios.get(`/api/v1/campgrounds/${id}`, {
-        withCredentials: true,
-      });
+      const result = await axios.get(
+        `http://localhost:8080/api/v1/campgrounds/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
       setCamping(result.data.data.campground);
       setIsLoading(false);
     };

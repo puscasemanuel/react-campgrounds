@@ -18,7 +18,7 @@ function App() {
 
   useEffect(() => {
     const fetchItems = async () => {
-      const result = await axios('/api/v1/campgrounds', {
+      const result = await axios('http://localhost:8080/api/v1/campgrounds', {
         withCredentials: true,
       });
       setItems(result.data.data.campgrounds);
