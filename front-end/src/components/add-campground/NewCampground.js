@@ -56,7 +56,7 @@ export const NewCampground = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post(`http://localhost:8080/api/v1/campgrounds`, data, {
+      .post(`/api/v1/campgrounds`, data, {
         withCredentials: true,
       })
       .then((res) => {
@@ -98,7 +98,12 @@ export const NewCampground = () => {
       ) : (
         <></>
       )}
-      <Form onSubmit={handleSubmit}>
+
+      <Form
+        onSubmit={handleSubmit}
+        className="shadow-lg p-3 mb-5 bg-white rounded p-5"
+      >
+        <h1 className="mt-3 mb-3">Create a new campground</h1>
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Title</Form.Label>
           <Form.Control
@@ -151,7 +156,7 @@ export const NewCampground = () => {
       </Form>
 
       <Link to="/">
-        <Button className="mt-5" variant="success">
+        <Button className="mt-2" variant="success">
           BACK
         </Button>
       </Link>

@@ -82,3 +82,32 @@ exports.validateSignup = (data) => {
     valid: Object.keys(errors).length === 0 ? true : false,
   };
 };
+
+exports.validateChangePassword = (data) => {
+  let errors = {};
+
+  if (isEmpty(data.oldPassword)) {
+    errors.oldPassword = 'Old password is empty';
+  }
+
+  if (isEmpty(data.newPassword)) {
+    errors.newPassword = 'New password is empty';
+  }
+
+  if (isEmpty(data.confirmNewPassword)) {
+    errors.confirmNewPassword = 'Please confirm the new password';
+  }
+
+  if (data.confirmNewPassword !== data.newPassword) {
+    errors.passwordMatch = 'Password does not match';
+  }
+
+  if (data.newPassword.length < 8) {
+    errors.passwordLength = 'Password must be at least 8 chars long';
+  }
+
+  return {
+    errors,
+    valid: Object.keys(errors).length === 0 ? true : false,
+  };
+};

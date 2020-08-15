@@ -15,12 +15,6 @@ const campgroundSchema = new mongoose.Schema({
     },
     username: String,
   },
-  // comments: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'Comment',
-  //   },
-  // ],
 });
 
 campgroundSchema.pre('save', function (next) {

@@ -13,6 +13,7 @@ export const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [show, setShow] = useState(true);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,13 +25,13 @@ export const Register = () => {
     };
 
     axios
-      .post('http://localhost:8080/api/v1/signup', data)
+      .post('/api/v1/signup', data)
       .then((result) => {
         if (result.data.status === 'success') {
-          alert('Account created successfully!');
+          setSuccess(true);
           setTimeout(() => {
-            window.location = '/';
-          }, 500);
+            window.location = '/login';
+          }, 1000);
         }
       })
       .catch((err) => {
@@ -41,7 +42,10 @@ export const Register = () => {
   };
 
   return (
-    <Container className="mt-5">
+    <Container className="mt-5 shadow-lg p-3 mb-5 bg-white rounded p-5">
+      <div className="text-center">
+        <h1>Sign up</h1>
+      </div>
       {Object.keys(errors).length > 0 && show ? (
         <Alert
           variant="danger"
@@ -57,6 +61,15 @@ export const Register = () => {
       ) : (
         <></>
       )}
+
+      {success ? (
+        <Alert variant="success" onClose={() => setSuccess(false)} dismissible>
+          Account successfully created!
+        </Alert>
+      ) : (
+        <></>
+      )}
+
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formBasicText">
           <Form.Label>Name</Form.Label>

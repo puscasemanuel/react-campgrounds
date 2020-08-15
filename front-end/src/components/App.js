@@ -10,6 +10,7 @@ import Header from '../components/header/Header';
 import { Register } from '../components/register/Register';
 import { Login } from '../components/login/Login';
 import { ProtectedRoute } from './ProtectedRoute';
+import { UserProfile } from './user-profile/UserProfile';
 //import FooterPagePro from './footer/Footer';
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
 
   useEffect(() => {
     const fetchItems = async () => {
-      const result = await axios('http://localhost:8080/api/v1/campgrounds', {
+      const result = await axios('/api/v1/campgrounds', {
         withCredentials: true,
       });
       setItems(result.data.data.campgrounds);
@@ -44,6 +45,12 @@ function App() {
         <Route exact path="/">
           <CampgroundsList isLoading={isLoading} items={items} />
         </Route>
+
+        <ProtectedRoute
+          exact
+          path="/profile"
+          component={UserProfile}
+        ></ProtectedRoute>
 
         <ProtectedRoute
           exact

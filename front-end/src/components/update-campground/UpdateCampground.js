@@ -32,12 +32,9 @@ export const UpdateCampground = () => {
 
   useEffect(() => {
     const campData = async () => {
-      const result = await axios.get(
-        `http://localhost:8080/api/v1/campgrounds/${id}`,
-        {
-          withCredentials: true,
-        }
-      );
+      const result = await axios.get(`/api/v1/campgrounds/${id}`, {
+        withCredentials: true,
+      });
       setCamping(result.data.data.campground);
       setIsLoading(false);
     };
@@ -83,7 +80,11 @@ export const UpdateCampground = () => {
     </div>
   ) : (
     <Container className="mt-5">
-      <Form onSubmit={handleSubmit}>
+      <Form
+        onSubmit={handleSubmit}
+        className="shadow-lg p-3 mb-5 bg-white rounded p-5"
+      >
+        <h1 className="mb-5">Update the campground</h1>
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Name</Form.Label>
           <Form.Control
@@ -93,7 +94,6 @@ export const UpdateCampground = () => {
             type="text"
             placeholder="Enter email"
           />
-          <Form.Text className="text-muted">Error will go here</Form.Text>
         </Form.Group>
 
         <Form.Group controlId="formBasicPassword">
@@ -137,7 +137,7 @@ export const UpdateCampground = () => {
       </Form>
 
       <Link to="/">
-        <Button className="mt-5" variant="success">
+        <Button className="mt-3" variant="success">
           BACK
         </Button>
       </Link>

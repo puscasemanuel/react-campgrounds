@@ -11,6 +11,7 @@ export const Login = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [show, setShow] = useState(true);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,7 +20,7 @@ export const Login = () => {
       password: password,
     };
     axios
-      .post('http://localhost:8080/api/v1/login', data, {
+      .post('/api/v1/login', data, {
         withCredentials: true,
       })
       .then((result) => {
@@ -28,7 +29,7 @@ export const Login = () => {
             'data',
             JSON.stringify(result.data.userData)
           );
-          alert('Logged In successfully!');
+          setSuccess(true);
           setTimeout(() => {
             window.location = '/';
           }, 1000);
@@ -42,7 +43,11 @@ export const Login = () => {
   };
 
   return (
-    <Container className="mt-5">
+    <Container className="mt-5 shadow-lg p-3 mb-5 bg-white rounded p-5">
+      <div className="text-center">
+        <h1>Login</h1>
+      </div>
+
       {Object.keys(errors).length > 0 && show ? (
         <Alert
           variant="danger"
@@ -54,6 +59,14 @@ export const Login = () => {
           {Object.keys(errors).map((item) => {
             return <p key={uuidv4()}>{errors[item]}</p>;
           })}
+        </Alert>
+      ) : (
+        <></>
+      )}
+
+      {success ? (
+        <Alert variant="success" onClose={() => setSuccess(false)} dismissible>
+          Success!
         </Alert>
       ) : (
         <></>

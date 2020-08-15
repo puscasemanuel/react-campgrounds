@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 
 const Header = () => {
   const [data, setData] = useState();
+
   const cookie = Cookies.get('session');
 
   useEffect(() => {
@@ -18,10 +19,9 @@ const Header = () => {
   const logOut = () => {
     window.localStorage.removeItem('data');
     document.cookie = 'session=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
-    alert('Disconnected!');
     setTimeout(() => {
       window.location = '/';
-    }, 500);
+    }, 10);
   };
 
   return (
@@ -41,7 +41,7 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Nav.Link>Welcome, {data.name}</Nav.Link>
+              <Nav.Link href="/profile">Welcome, {data.name}</Nav.Link>
               <Nav.Link href="#" onClick={logOut}>
                 Logout
               </Nav.Link>

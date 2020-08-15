@@ -39,6 +39,7 @@ exports.signup = async (req, res, next) => {
     email: newUser.email,
     password: newUser.password,
     passwordConfirm: newUser.passwordConfirm,
+    photo: 'public/profileImage/avatarPlaceholder.png',
   });
 
   const token = signToken(addNewUser._id);
@@ -69,7 +70,7 @@ exports.login = async (req, res, next) => {
       });
     }
 
-    //if eery is ok send the token to the client
+    //if ok send the token to the client
     const token = signToken(user._id);
     req.headers.authorization = token;
     if (token) {
@@ -93,6 +94,7 @@ exports.login = async (req, res, next) => {
 
 exports.protect = async (req, res, next) => {
   // 1) Getting token and check if is there
+  let user;
   const token = req.cookies.jwt;
   const logSession = req.cookies.session;
   if (token && logSession) {
@@ -100,17 +102,16 @@ exports.protect = async (req, res, next) => {
     //2) Verification token
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if (!err) {
-        freshUser = await User.findById(decoded.id);
-        if (freshUser) {
-          req.user = freshUser;
+        user = await User.findById(decoded.id);
+        if (user) {
+          req.user = user;
+          return next();
         }
         if (!freshUser) {
           console.log('Not the user!');
         }
       }
     });
-
-    return next();
   } else {
     return res.json({
       status: 'fail',
